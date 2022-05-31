@@ -9,6 +9,7 @@ import time
 import random
 import string
 from anticaptchaofficial.hcaptchaproxyless import *
+print("Pr0t0n GEN V1.1")
 blacklisted_IPS = []
 IPS_in_use = []
 init(convert=True)
