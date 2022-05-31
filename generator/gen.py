@@ -1,5 +1,5 @@
+
 # MADE BY PR0T0N!!! I am working on adding Email Verification and Phone Verification!
-from ast import For
 import colorama
 from colorama import init, Fore
 from structures import ProxyPool, Proxy
@@ -7,11 +7,13 @@ import threading
 import json
 import time
 import random
+import os
+import requests
 import string
 from anticaptchaofficial.hcaptchaproxyless import *
-print("Pr0t0n GEN V1.1")
 blacklisted_IPS = []
 IPS_in_use = []
+Version = "V1.2"
 init(convert=True)
 colorama.init(autoreset=True)
 site_key = "4c672d35-0701-42b2-88c3-78380b0db560"
@@ -130,6 +132,10 @@ def create_account(proxy: Proxy):
         file.write(f"{email}:{password}:{token}\n")
         file.close()
         return
+def clear_screen():
+    os.system("clear")
+    os.system("cls")
+    return
 class Thread(threading.Thread):
     def run(self):
         while True:
@@ -147,10 +153,70 @@ class Thread(threading.Thread):
                     print("|>" + Fore.RED + " Proxy Error")
                 blacklisted_IPS.append(proxy)
 def main():
+    print(Fore.GREEN + "Started Generator!")
     threads = [Thread() for _ in range(threadss)]
     for t in threads:
         t.start()
     for t in threads:
         t.join()
+def check_up_to_date():
+    url = "https://checkuptodate.crypticsserver.repl.co"
+    response = requests.get(url)
+    data = response.text
+    if Version in data:
+        print(Fore.LIGHTGREEN_EX + "Generator Up to Date!")
+    else:
+        print(Fore.RED + "Generator Out of date please update for new features!\nLink: https://github.com/Pr0t0ns/Discord-Token-Generator/releases")
+    return
+def menu():
+    clear_screen()
+    print(Fore.RED + "                      /$$$$$$    /$$      /$$$$$$                   /$$$$$$                     ")
+    print(Fore.LIGHTMAGENTA_EX + "                     /$$$_  $$  | $$     /$$$_  $$                 /$$__  $$                    ")
+    print(Fore.LIGHTGREEN_EX + "  /$$$$$$   /$$$$$$ | $$$$\ $$ /$$$$$$  | $$$$\ $$ /$$$$$$$       | $$  \__/  /$$$$$$  /$$$$$$$ ")
+    print(Fore.GREEN + " /$$__  $$ /$$__  $$| $$ $$ $$|_  $$_/  | $$ $$ $$| $$__  $$      | $$ /$$$$ /$$__  $$| $$__  $$")
+    print(Fore.BLUE + "| $$  \ $$| $$  \__/| $$\ $$$$  | $$    | $$\ $$$$| $$  \ $$      | $$|_  $$| $$$$$$$$| $$  \ $$")
+    print(Fore.LIGHTCYAN_EX + "| $$  | $$| $$      | $$ \ $$$  | $$ /$$| $$ \ $$$| $$  | $$      | $$  \ $$| $$_____/| $$  | $$")
+    print(Fore.LIGHTRED_EX + "| $$$$$$$/| $$      |  $$$$$$/  |  $$$$/|  $$$$$$/| $$  | $$      |  $$$$$$/|  $$$$$$$| $$  | $$")
+    print(Fore.LIGHTMAGENTA_EX + "| $$____/ |__/       \______/    \___/   \______/ |__/  |__/       \______/  \_______/|__/  |__/")
+    print(Fore.YELLOW + "| $$                                                                                            ")
+    print(Fore.LIGHTGREEN_EX + "| $$                                                                                            ")
+    print(Fore.LIGHTBLUE_EX + "|__/                                                                                            \n")
+    print(f"Version: {Version}")
+    check_up_to_date()
 
-main()
+    print("1) Start")
+    print("2) Check Config")
+    print("3) Github Link")
+    print("4) Credits")
+    print("5) Exit\n")
+    choice = input("Choice: ")
+    choice = int(choice)
+    clear_screen()
+    if choice == 1:
+        return main()
+    elif choice == 2:
+        print("config.json Configurations\n")
+        print(f"Threads Running: {threadss}")
+        print(f"AntiCaptcha API key: {anticaptcha_API}")
+        print(f"Password for accounts: {password}")
+        print(f"Date of Birth for accounts: {birthday}")
+        print(f"Display Proxy Errors: {show_proxy_errors}")
+        print(f"Join Server on token Creation: {join_server}")
+        print(f"Invite Link to join on token creation: {invite_link}\n")
+        input("Click Enter to return to menu")
+        return menu()
+    elif choice == 3:
+        print("Github Link: https://github.com/Pr0t0ns/Discord-Token-Generator\n")
+        input("Click Enter to return to menu")
+        return menu()
+    elif choice == 4:
+        print("Token Generator made completley by Pr0t0n mainly using http.client library\n")
+        input("Click Enter to return to menu")
+        return menu()
+    elif choice == 5:
+        exit(0)
+    else:
+        print("Option Not found")
+        time.sleep(3)
+        return menu()
+menu()
