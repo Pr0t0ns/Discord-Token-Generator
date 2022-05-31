@@ -4,7 +4,6 @@ import random
 from itertools import cycle
 from http.client import HTTPSConnection
 
-# should probably replace this with a better approach for counting
 
 class Proxy:
     def __init__(self, proxy):
