@@ -10,10 +10,15 @@ import random
 import os
 import requests
 import string
+import ctypes
 from anticaptchaofficial.hcaptchaproxyless import *
+try:
+	ctypes.windll.kernel32.SetConsoleTitleW("[FREE] Pr0t0n Generator || V1.3")
+except:
+	pass
 blacklisted_IPS = []
 IPS_in_use = []
-Version = "V1.2"
+Version = "V1.3"
 init(convert=True)
 colorama.init(autoreset=True)
 site_key = "4c672d35-0701-42b2-88c3-78380b0db560"
@@ -59,21 +64,26 @@ def generate_email(length):
         email += letter
     email += domain
     return email
-def get_fingerprint(proxy: Proxy):
-    conn = proxy.get_connection("discord.com")
-    conn.putrequest("GET", "/api/v9/experiments")
-    conn.endheaders()
-    response = conn.getresponse()
-    response = response.read()
-    fingerprint = json.loads(response)
-    fingerprint = fingerprint['fingerprint']
+def get_fingerprint():
+    url = "https://discord.com/api/v9/experiments"
+    response = requests.get(url)
+    response = response.json()
+    fingerprint = response['fingerprint']
     return fingerprint
+    #conn = proxy.get_connection("discord.com")
+    #conn.putrequest("GET", "/api/v9/experiments")
+    #conn.endheaders()
+    #response = conn.getresponse()
+    #response = response.read()
+    #fingerprint = json.loads(response)
+    #fingerprint = fingerprint['fingerprint']
+    #return fingerprint
 
 def create_account(proxy: Proxy):
     if proxy in IPS_in_use:
         return
     IPS_in_use.append(proxy)
-    fingerprint = get_fingerprint(proxy)
+    fingerprint = get_fingerprint()
     username = generate_username(random.randint(8, 12))
     email = generate_email(random.randint(9, 13))
     Captcha = solve_captcha()
