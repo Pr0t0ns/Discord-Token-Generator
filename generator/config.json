@@ -2,9 +2,12 @@
     "NOTE FOR NEWBIES": "Join_Server_On_Creation allows the token to automatically join the server you linked in Server_Invite as soon as it's created. If you have the feature enabled make sure to put the last 8 Characters of the invite link in Server_Invite",
     "threads": 10,
     "anticaptcha_api_key": "",
-    "password": "Pr0t0n1!23$",
+    "capmonster_api_key": "",
+    "use_capmonster": false,
+    "password": "Pr0t0nGenerator1!",
     "Date_of_birth": "1990-05-02",
     "Display_proxy_errors": false,
     "Join_Server_On_Creation": false,
-    "Server_Invite": "None" 
+    "Server_Invite": "hz5hhgxy",
+    "user:pass@ip:port format": false
 }
