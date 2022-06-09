@@ -1,11 +1,10 @@
 
-# MADE BY PR0T0N!!! I am working on adding Email Verification and Phone Verification!
-from ast import AnnAssign
-import email
-from http import cookies
+# MADE BY PR0T0N!!! Working on adding AI Solver 
+# Telegram link
+
+
 import colorama
 from colorama import init, Fore
-from numpy import char, result_type
 from structures import ProxyPool, Proxy
 import threading
 import json
@@ -23,9 +22,10 @@ from anticaptchaofficial.hcaptchaproxyless import *
 blacklisted_IPS = []
 IPS_in_use = []
 auth_proxies = []
+char_symbols = ["!", "@", "#", "$", "5"]
 total_auth_proxies = 0
 index_pos = 0
-Version = "V1.5"
+Version = "V1.6"
 proxy_recycle_message_sent = False
 init(convert=True)
 colorama.init(autoreset=True)
@@ -51,8 +51,11 @@ with open("config.json") as config:
     if_ip_auth = config['user:pass@ip:port format']
     hotmailbox_API_key = config['hotmailbox_API']
     use_hotmailbox = config['use_hotmailbox']
-    
+    gen_passwords = config['generate_password']
+    fivesim_API = config["5sim_API"]
+    use_5sim = config['use_5sim']
     del config
+
 try:
 	ctypes.windll.kernel32.SetConsoleTitleW(f"[FREE] Pr0t0n Generator | {Version} | Threads: {threadss}")
 except:
@@ -64,6 +67,8 @@ def purchase_email():
     email = data['Data']['Emails'][0]['Email']
     email_password = data['Data']['Emails'][0]['Password']
     return email, email_password
+
+
 
 def parse_ip_port_proxy(proxy):
     IP = ""
@@ -92,7 +97,7 @@ def solve_email_captcha(proxy=None):
         if use_proxies_for_capmonster == True and proxy != None:
             if if_ip_auth == False:
                 ip, port = parse_ip_port_proxy(proxy)
-                print("|>" + Fore.YELLOW + " Solving Email Captcha")
+                print("|>" + Fore.YELLOW + " Solving Email/Phone Captcha")
                 capmonster = HCaptchaTask(capmonster_API)
                 try:
                     capmonster.set_proxy("http", ip, port)
@@ -105,7 +110,7 @@ def solve_email_captcha(proxy=None):
                     return ""
             else:
                 ip_username, ip_password, ip_ip, ip_port = parse_auth_proxy(proxy)
-                print("|>" + Fore.YELLOW + " Solving Email Captcha")
+                print("|>" + Fore.YELLOW + " Solving Email/Phone Captcha")
                 capmonster = HCaptchaTask(capmonster_API)
                 try:
                     capmonster.set_proxy("http", ip_ip, ip_port, ip_username, ip_password)
@@ -117,14 +122,14 @@ def solve_email_captcha(proxy=None):
                     print("this proxy does not work with capmonster!")
                     return ""
         else:
-            print("|>" + Fore.YELLOW + " Solving Email Captcha")
+            print("|>" + Fore.YELLOW + " Solving Email/Phone Captcha")
             capmonster = HCaptchaTask(capmonster_API)
             task_id = capmonster.create_task("https://discord.com", site_key)
             result = capmonster.join_task_result(task_id)
             g_response = result.get("gRecaptchaResponse")
             return g_response
     elif use_2captcha == True:
-        print("|>" + Fore.YELLOW + " Solving Email Captcha")
+        print("|>" + Fore.YELLOW + " Solving Email/Phone Captcha")
         solver = TwoCaptcha(twocaptcha_API)
         try:
             result = solver.hcaptcha(
@@ -137,6 +142,7 @@ def solve_email_captcha(proxy=None):
             return ""
         else:
             print("|>" + Fore.GREEN + " Solved Captcha")
+            result = result.get("code")
             return result
     else:
         print("|>" + Fore.YELLOW + " Solving Captcha")
@@ -235,6 +241,7 @@ def generate_email(length):
         email += letter
     email += domain
     return email
+
 def get_fingerprint(proxy):
     if if_ip_auth == False:
         conn = proxy.get_connection("discord.com")
@@ -299,6 +306,194 @@ def parse_auth_proxy(proxy):
             elif colons_hit == 3:
                 ip_port += character
     return ip_username, ip_password, ip_ip, ip_port
+def verify_phone(proxy, discord_token, discord_password):
+    if use_5sim == True:
+        token = fivesim_API
+        country = 'russia'
+        operator = 'any'
+        product = 'discord'
+        
+        headers = {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/json',
+        }
+        response = requests.get('https://5sim.net/v1/user/buy/activation/' + country + '/' + operator + '/' + product, headers=headers)
+        phone_number = response.json()['phone']
+        phone_id = response.json()['id']
+        try:
+            phone_id_str = str(phone_id)
+        except Exception as error:
+            print(error)
+        captcha_key = solve_email_captcha()
+        if if_ip_auth == False:
+            headers = {
+                "authorization": discord_token,
+                "content-type": "application/json",
+                "cookie": "__dcfduid=156676b0e52511ecab049748e388ba01; __sdcfduid=156676b1e52511ecab049748e388ba016c54df50488a2d1e13423eba666addd5a3d24e93d46dddf02e471fa26e7d7b7a",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.33 Safari/537.36",
+                "x-debug-options": "bugReporterEnabled",
+                "x-discord-locale": "en-US",
+                "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMy4wLjUwNjAuMzMgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMy4wLjUwNjAuMzMiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMwODMyLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+            }
+            payload = {
+                "captcha_key": captcha_key,
+                "change_phone_reason": "user_action_required",
+                "phone": phone_number
+            }
+            payload = json.dumps(payload)
+            conn = proxy.get_connection("discord.com")
+            conn.request("POST", "/api/v9/users/@me/phone", payload, headers)
+            response = conn.getresponse()
+            if int(response.status) == 204:
+                print("|>" + Fore.LIGHTYELLOW_EX + " Sent Verification Code to Phone Number")
+            else:
+                print("|>" + Fore.LIGHTRED_EX + " Could not send verification code to number!")
+                return
+            result = ""
+            headers = {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/json',
+            }
+            Retrys = 0
+            while result != "NULL":
+                response = requests.get('https://5sim.net/v1/user/check/' + phone_id_str, headers=headers)
+                data = response.json()
+                result = data['status']
+                try:
+                    code = data['sms'][0]['code']
+                    break
+                except Exception as error:
+                    Retrys += 1
+                    if Retrys > 375:
+                        print("|>" + Fore.RED + " Could not find Verification Code from discord!")
+                        return
+            headers = {
+                "authorization": discord_token,
+                "content-type": "application/json",
+                "cookie": "__dcfduid=156676b0e52511ecab049748e388ba01; __sdcfduid=156676b1e52511ecab049748e388ba016c54df50488a2d1e13423eba666addd5a3d24e93d46dddf02e471fa26e7d7b7a",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.33 Safari/537.36",
+                "x-debug-options": "bugReporterEnabled",
+                "x-discord-locale": "en-US",
+                "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMy4wLjUwNjAuMzMgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMy4wLjUwNjAuMzMiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMwODMyLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+            }
+            payload = {
+                "code": code,
+                "phone": phone_number
+            }
+            payload = json.dumps(payload)
+
+        else:
+            ip_username, ip_password, ip_ip, ip_port = parse_auth_proxy(proxy)
+            proxy_details = {
+                "url" : ip_ip, 
+                "port" : ip_port, 
+                "username" : ip_username, 
+                "password" : ip_password 
+            }
+            host_details = {
+                "url" : "discord.com",
+                "port" : 443 
+            }
+            headers = {
+                "authorization": discord_token,
+                "content-type": "application/json",
+                "cookie": "__dcfduid=156676b0e52511ecab049748e388ba01; __sdcfduid=156676b1e52511ecab049748e388ba016c54df50488a2d1e13423eba666addd5a3d24e93d46dddf02e471fa26e7d7b7a",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.33 Safari/537.36",
+                "x-debug-options": "bugReporterEnabled",
+                "x-discord-locale": "en-US",
+                "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMy4wLjUwNjAuMzMgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMy4wLjUwNjAuMzMiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMwODMyLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+            }
+            payload = {
+                "captcha_key": captcha_key,
+                "change_phone_reason": "user_action_required",
+                "phone": phone_number
+            }
+            payload = json.dumps(payload)
+            conn = http.client.HTTPSConnection(proxy_details['url'], proxy_details['port'])
+            auth = '%s:%s' % (proxy_details['username'], proxy_details['password'])
+            headers['Proxy-Authorization'] = 'Basic ' + str(base64.b64encode(auth.encode())).replace("b'", "").replace("'", "")
+            conn.set_tunnel(host_details['url'], host_details['port'], headers)
+            conn.request("POST", "/api/v9/users/@me/phone", payload, headers)
+            response = conn.getresponse()
+            if int(response.status) == 204:
+                print("|>" + Fore.LIGHTYELLOW_EX + " Sent Verification Code to Phone Number")
+            else:
+                print("|>" + Fore.LIGHTRED_EX + " Could not send verification code to number!")
+                return
+            result = ""
+            headers = {
+                'Authorization': 'Bearer ' + token,
+                'Accept': 'application/json',
+            }
+            Retrys = 0
+            while result != "NULL":
+                response = requests.get('https://5sim.net/v1/user/check/' + phone_id_str, headers=headers)
+                data = response.json()
+                result = data['status']
+                try:
+                    code = data['sms'][0]['code']
+                    break
+                except Exception as error:
+                    Retrys += 1
+                    if Retrys > 375:
+                        print("|>" + Fore.RED + " Could not find Verification Code from discord!")
+                        return
+            headers = {
+                "authorization": discord_token,
+                "content-type": "application/json",
+                "cookie": "__dcfduid=156676b0e52511ecab049748e388ba01; __sdcfduid=156676b1e52511ecab049748e388ba016c54df50488a2d1e13423eba666addd5a3d24e93d46dddf02e471fa26e7d7b7a",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.33 Safari/537.36",
+                "x-debug-options": "bugReporterEnabled",
+                "x-discord-locale": "en-US",
+                "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMy4wLjUwNjAuMzMgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMy4wLjUwNjAuMzMiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMwODMyLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+            }
+            payload = {
+                "code": code,
+                "phone": phone_number
+            }
+            payload = json.dumps(payload)
+            conn = http.client.HTTPSConnection(proxy_details['url'], proxy_details['port'])
+            auth = '%s:%s' % (proxy_details['username'], proxy_details['password'])
+            headers['Proxy-Authorization'] = 'Basic ' + str(base64.b64encode(auth.encode())).replace("b'", "").replace("'", "")
+            conn.set_tunnel(host_details['url'], host_details['port'], headers)
+            conn.request("POST", "/api/v9/phone-verifications/verify", payload, headers)
+            response = conn.getresponse()
+            if int(response.status) == 200:
+                pass
+            else:
+                print("|>" + Fore.RED +" Invalid Verification Code!")
+                return
+            response = response.read()
+            verify_url_token = json.loads(response)
+            verify_url_token = verify_url_token['token']
+            headers = {
+                "authorization": discord_token,
+                "content-type": "application/json",
+                "cookie": "__dcfduid=156676b0e52511ecab049748e388ba01; __sdcfduid=156676b1e52511ecab049748e388ba016c54df50488a2d1e13423eba666addd5a3d24e93d46dddf02e471fa26e7d7b7a",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.33 Safari/537.36",
+                "x-debug-options": "bugReporterEnabled",
+                "x-discord-locale": "en-US",
+                "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMy4wLjUwNjAuMzMgU2FmYXJpLzUzNy4zNiIsImJyb3dzZXJfdmVyc2lvbiI6IjEwMy4wLjUwNjAuMzMiLCJvc192ZXJzaW9uIjoiMTAiLCJyZWZlcnJlciI6IiIsInJlZmVycmluZ19kb21haW4iOiIiLCJyZWZlcnJlcl9jdXJyZW50IjoiIiwicmVmZXJyaW5nX2RvbWFpbl9jdXJyZW50IjoiIiwicmVsZWFzZV9jaGFubmVsIjoic3RhYmxlIiwiY2xpZW50X2J1aWxkX251bWJlciI6MTMwODMyLCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsfQ=="
+            }
+            payload = {
+                "change_phone_reason": "user_action_required",
+                "password": discord_password,
+                "phone_token": verify_url_token
+            }
+            payload = json.dumps(payload)
+            conn = http.client.HTTPSConnection(proxy_details['url'], proxy_details['port'])
+            auth = '%s:%s' % (proxy_details['username'], proxy_details['password'])
+            headers['Proxy-Authorization'] = 'Basic ' + str(base64.b64encode(auth.encode())).replace("b'", "").replace("'", "")
+            conn.set_tunnel(host_details['url'], host_details['port'], headers)
+            conn.request("POST", "/api/v9/users/@me/phone", payload, headers)
+            response = conn.getresponse()
+            if int(response.status) == 204:
+                print("|>" + Fore.LIGHTGREEN_EX + f" Phone Verified {discord_token}")
+                return
+            else:
+                print("|>" + Fore.RED + " Issue Verifying Response Code!")
+                return
+        return
 def verify_email(token, username, password, proxy):
     url = f'https://getcode.hotmailbox.me/discord?email={username}&password={password}&timeout=50'
     data = requests.get(url)
@@ -423,13 +618,26 @@ def verify_email(token, username, password, proxy):
         else:
             print("|>" + Fore.RED + " Issue Verifying Email!")
             return
-        
+def generate_passwords(length):
+    length -= 2
+    password = ""
+    for i in range(length):
+        letter = random.choice(string.ascii_lowercase)
+        password += letter
+    symbol1 = random.choice(char_symbols)
+    symbol2 = random.choice(char_symbols)
+    password += symbol1
+    password += symbol2
+    return password
+
 def create_account(proxy):
     if proxy in IPS_in_use:
         return
     IPS_in_use.append(proxy)
     if if_ip_auth == True:
         ip_username, ip_password, ip_ip, ip_port = parse_auth_proxy(proxy)
+    if gen_passwords == True:
+        password = generate_passwords(random.randint(15, 19))
     fingerprint, dcfduid, sdcfduid = get_fingerprint(proxy)
     username = generate_username(random.randint(8, 12))
     email = generate_email(random.randint(9, 13))
@@ -498,6 +706,10 @@ def create_account(proxy):
                 print("|>" + Fore.CYAN + f" Attemping To Email Verify {token}")
                 verify_mail = verify_email(token, email, email_password, proxy)
                 return
+            if use_5sim == True:
+                print("|>" + Fore.CYAN + f" Attempting to Phone Verify {token}")
+                res = verify_phone(proxy, token, password)
+                return
             else:
                 return
     else:
@@ -559,6 +771,9 @@ def create_account(proxy):
             if use_hotmailbox == True:
                 print("|>" + Fore.CYAN + f" Attemping To Email Verify {token}")
                 verify_mail = verify_email(token, email, email_password, proxy)
+            if use_5sim == True:
+                print("|>" + Fore.CYAN + f" Attempting to Phone Verify {token}")
+                res = verify_phone(proxy, token, password)
             else:
                 return
             return
