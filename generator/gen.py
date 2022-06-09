@@ -1,6 +1,6 @@
 
 # MADE BY PR0T0N!!! Working on adding AI Solver 
-# Telegram link
+# Telegram link: https://t.me/+Tvbz-xGh_5pjYzVh
 
 
 import colorama
