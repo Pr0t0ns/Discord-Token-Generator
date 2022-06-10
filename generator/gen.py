@@ -2,7 +2,6 @@
 # MADE BY PR0T0N!!! Working on adding AI Solver 
 # Telegram link: https://t.me/+Tvbz-xGh_5pjYzVh
 
-
 import colorama
 from colorama import init, Fore
 from structures import ProxyPool, Proxy
@@ -705,13 +704,12 @@ def create_account(proxy):
             if use_hotmailbox == True:
                 print("|>" + Fore.CYAN + f" Attemping To Email Verify {token}")
                 verify_mail = verify_email(token, email, email_password, proxy)
-                return
             if use_5sim == True:
                 print("|>" + Fore.CYAN + f" Attempting to Phone Verify {token}")
                 res = verify_phone(proxy, token, password)
-                return
             else:
                 return
+            return
     else:
         proxy_details = {
             "url" : ip_ip, 
