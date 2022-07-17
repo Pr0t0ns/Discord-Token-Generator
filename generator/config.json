@@ -7,8 +7,8 @@
     "capmonster_use_proxies": false,
     "use_2captcha": false,
     "use_capmonster": false,
-    "password": "Pr0tonONTOp!@#",
-    "Date_of_birth": "1990-05-02",
+    "password": "Pr0tonONTOp#@#",
+    "Date_of_birth": "1990-06-02",
     "Display_proxy_errors": false,
     "Join_Server_On_Creation": false,
     "Server_Invite": "hz5hhgxy",
@@ -17,5 +17,7 @@
     "use_hotmailbox": false,
     "generate_password": true,
     "5sim_API": "",
-    "use_5sim": false
+    "use_5sim": false,
+    "5sim_country": "russia",
+    "5sim_op": "any"
 }
