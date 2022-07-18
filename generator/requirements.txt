@@ -3,3 +3,4 @@ requests
 anticaptchaofficial
 capmonster-python
 2captcha-python
+invisifox
