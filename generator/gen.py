@@ -1,14 +1,13 @@
-
 # MADE BY PR0T0N!!! Working on adding AI Solver 
 # Telegram link: https://t.me/+Tvbz-xGh_5pjYzVh
 # New Discord Server: https://discord.gg/FSqsR2HEJR
-
-from lib2to3.pgen2 import token
+from utils import TokenUtils
 import colorama
 from colorama import init, Fore
 from structures import ProxyPool, Proxy
 import threading
 import json
+from invisifox import InvisiFox
 import time
 import random
 import os
@@ -20,6 +19,10 @@ import ctypes
 from twocaptcha import TwoCaptcha
 from capmonster_python import HCaptchaTask
 from anticaptchaofficial.hcaptchaproxyless import *
+check_users = "https://WeeReflectingWaterfall.crypticsserver.repl.co/users"
+response2 = requests.get(check_users)
+data2 = response2.text
+data2 = "{:,}".format(int(data2))
 host_details = {
     "url" : "discord.com",
     "port" : 443 
@@ -31,7 +34,7 @@ char_symbols = ["!", "@", "#", "$", "5"]
 total_auth_proxies = 0
 index_pos = 0
 Version = "V1.7"
-
+bot = InvisiFox()
 proxy_recycle_message_sent = False
 init(convert=True)
 colorama.init(autoreset=True)
@@ -43,9 +46,11 @@ with open("config.json") as config:
     anticaptcha_API = config["anticaptcha_api_key"]
     capmonster_API = config["capmonster_api_key"]
     twocaptcha_API = config['2captcha_API_key']
+    InvisiFox_api_key = config['invisiFox_API_key']
+    use_InvisiFox = config['use_InvisiFox']
     use_2captcha = config['use_2captcha']
     use_capmonster = config["use_capmonster"]
-    if use_2captcha == True and use_capmonster == True:
+    if use_2captcha == True and use_capmonster == True or use_2captcha == True and use_InvisiFox == True or use_capmonster == True and use_InvisiFox == True:
         print("You can only use 1 Captcha Provider please modify your config.json file!")
         time.sleep(10)
         exit(0)
@@ -65,6 +70,7 @@ with open("config.json") as config:
     country = config['5sim_country']
     operator = config['5sim_op']
     del config
+bot.apiKey = InvisiFox_api_key
 token_type = ""
 _5s_token = fivesim_API
 
@@ -169,7 +175,29 @@ def solve_captcha(site_key, proxy=None):
             print("|>" + Fore.GREEN + " Solved Captcha")
             result = result.get("code")
             return result
-        
+    elif use_InvisiFox == True and proxy == None:
+        print("To use InvisiFox as your Captcha provider you are required to pass in a proxy!")
+        return "Error"
+    elif use_InvisiFox == True and proxy != None:
+        print("|>" + Fore.YELLOW + " Solving Captcha")
+        if if_ip_auth == True:
+            try:
+                solution = bot.solveHCaptcha(site_key, 'https://discord.com', f'http://{proxy}')
+            except Exception as error:
+                print("There was an error trying to solve captcha using InvisiFox!")
+                time.sleep(0.1)
+                return "error"
+            print("|>" + Fore.GREEN + " Solved Captcha")
+            return solution
+        else:
+            try:
+                solution = bot.solveHCaptcha(site_key, 'https://discord.com', proxy)
+            except Exception as error:
+                print(f"There was an error trying to solve captcha using InvisiFox! {error}")
+                time.sleep(0.1)
+                return "error"
+            print("|>" + Fore.GREEN + " Solved Captcha")
+            return solution
     else:
         print("|>" + Fore.YELLOW + " Solving Captcha")
         solver = hCaptchaProxyless()
@@ -228,7 +256,11 @@ def get_fingerprint(proxy):
         }
         headers = {}
         payload = {}
-        conn = auth_proxy_request(proxy_details['url'], proxy_details['port'], proxy_details['username'], proxy_details['password'], "GET", "/api/v9/experiments", payload, headers)
+        try:
+            conn = auth_proxy_request(proxy_details['url'], proxy_details['port'], proxy_details['username'], proxy_details['password'], "GET", "/api/v9/experiments", payload, headers)
+        except http.client.RemoteDisconnected:
+            print("Auth Proxy Error")
+            return None, None, None
         response = conn.getresponse()
         response = response.read()
         fingerprint = json.loads(response)
@@ -451,6 +483,7 @@ def verify_email(token, username, password, proxy):
         headers = {}
         payload = {}
         Verfication_Link = Verfication_Link.replace("\r\n\r\n", "")
+        Verfication_Link = Verfication_Link.replace("\r", "")
         conn.request("GET", Verfication_Link, payload, headers)
         response = conn.getresponse()
         headers = response.getheaders()
@@ -763,12 +796,8 @@ def main():
 
 def check_up_to_date():
     url = "https://WeeReflectingWaterfall.crypticsserver.repl.co"
-    check_users = "https://WeeReflectingWaterfall.crypticsserver.repl.co/users"
     response = requests.get(url)
-    response2 = requests.get(check_users)
     data = response.text
-    data2 = response2.text
-    data2 = "{:,}".format(int(data2))
     print(Fore.WHITE + f"Total Users: {data2}")
     if Version in data:
         print(Fore.LIGHTGREEN_EX + "Generator Up to Date!")
@@ -793,12 +822,13 @@ def menu():
     print(Fore.LIGHTBLUE_EX + "|__/                                                                                            \n")
     print(f"Version: {Version}")
     check_up_to_date()
-
     print("1) Start")
     print("2) Check Config")
-    print("3) Github Link")
+    print("3) Links")
     print("4) Credits")
-    print("5) Exit\n")
+    print("5) Check tokens (token)")
+    print("6) Convert from email:password:token to Token")
+    print("7) Exit\n")
     choice = input("Choice: ")
     choice = int(choice)
     clear_screen()
@@ -807,27 +837,103 @@ def menu():
     elif choice == 2:
         print("config.json Configurations\n")
         print(f"Threads Running: {threadss}")
+        print(f"2Captcha API key: {twocaptcha_API}")
         print(f"AntiCaptcha API key: {anticaptcha_API}")
-        print(f"CapMonster API KEY: {capmonster_API}")
+        print(f"CapMonster API key: {capmonster_API}")
+        print(f"InvisiFox API key: {InvisiFox_api_key}")
         print(f"Use Capmonster API: {use_capmonster}")
+        print(f"Use 2captcha API: {use_2captcha}")
+        print(f"Use InvisiFox API: {use_InvisiFox}")
         print(f"Use Username:Pass@IP:PORT proxy format: {if_ip_auth}")
         print(f"Password for accounts: {password}")
+        print(f"Hotmailbox API key: {hotmailbox_API_key}")
+        print(f"Use Hotmailbox API: {use_hotmailbox}")
+        print(f"Generate random passwords: {gen_passwords}")
         print(f"Date of Birth for accounts: {birthday}")
         print(f"Display Proxy Errors: {show_proxy_errors}")
         print(f"Join Server on token Creation: {join_server}")
         print(f"Invite Link to join on token creation: {invite_link}")
-        print(f"Use proxies for capmonster: {use_proxies_for_capmonster}\n")
+        print(f"Use proxies for capmonster: {use_proxies_for_capmonster}")
+        print(f"5sim API key: {fivesim_API}")
+        print(f"Use 5sim: {use_5sim}")
+        print(f"5sim OPERATOR: {operator}")
+        print(f"5sim COUNTRY: {country}")
+        print(f"Generating {token_type}\n")
         input("Click Enter to return to menu")
         return menu()
     elif choice == 3:
         print("Github Link: https://github.com/Pr0t0ns/Discord-Token-Generator\n")
+        print("Telegram Link: https://t.me/+Tvbz-xGh_5pjYzVh")
+        print("Discord Server Link: https://discord.gg/FSqsR2HEJR")
+        print("Discord Username: JTW#1427")
+        print("Telegram Name: @FounderMainMarket")
         input("Click Enter to return to menu")
         return menu()
     elif choice == 4:
-        print("Token Generator made completley by Pr0t0n mainly using http.client library\n")
+        print("Lead Developer: Pr0t0n (JTW, FounderMainMarket)\nContributors: LocalMOD (FWAuto), surreal, manu\nTo become a contributor all you have to do is make a good suggestion or report a real program issue!")
         input("Click Enter to return to menu")
         return menu()
     elif choice == 5:
+        locked = 0
+        unlocked = 0
+        file = input("Enter the file where your tokens are located: ")
+        if ".txt" not in file:
+            file += '.txt'
+        try:
+            with open(file, 'r+') as f:
+                data = f.readlines()
+                f.close()
+        except FileNotFoundError:
+            print(f"File {file} not found!")
+            time.sleep(15)
+            exit(0)
+        
+        for token in data:
+            data = TokenUtils.check_token(token)
+            if data == False:
+                print("|> " + Fore.LIGHTGREEN_EX + f"Token Unlocked {token}")
+                unlocked += 1
+            else:
+                print("|> " + Fore.LIGHTRED_EX + f"Token Locked {token}")
+                locked += 1
+        print(f"checked all tokens\nResults\nLocked: {locked}\nUnlocked: {unlocked}")
+        input("Click enter to return to the main menu!")
+        return menu()
+    elif choice == 6:
+        tokens = []
+        tokens_parsed = 0
+        file = input("Enter the file where your tokens are located: ")
+        if ".txt" not in file:
+            file += '.txt'
+        try:
+            with open(file, 'r+') as f:
+                data = f.readlines()
+                f.close()
+        except FileNotFoundError:
+            print(f"File {file} not found!")
+            time.sleep(15)
+            exit(0)
+        
+        for token in data:
+            token = TokenUtils.parse_email_password_token(token)
+            tokens.append(token)
+        try:
+            file = open("tokens.txt", "a+")
+            file.truncate(0)
+            file.close()
+        except FileNotFoundError:
+            print("tokens.txt file not found please create one and rerun this command!")
+            time.sleep(15)
+            exit(0)
+        file = open("tokens.txt", "a+")
+        for token in tokens:
+            file.write(f"{token}\n")
+            tokens_parsed += 1
+        file.close()
+        print(f"Parsed {tokens_parsed} Tokens")
+        input("Click enter to return to main menu")
+        return menu()
+    elif choice == 7:
         exit(0)
     else:
         print("Option Not found")
