@@ -97,7 +97,7 @@ auth_proxies = []
 char_symbols = ["!", "@", "#", "$", "^", "(", "&", "%"]
 total_auth_proxies = 0
 index_pos = 0
-Version = "V1.8"
+Version = "V1.9"
 domains = ["@gmail.com", "@yahoo.com", "@outlook.com", "@hotmail.com", "@protonmail.com"]
 
 # Initilazing stuff like Solver API's and colorama
